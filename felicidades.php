@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Felicidades</title>
-    </head>
-    <body style="font-size:3em;">
-        <h1>VAMOS CARAJO ! </h1>
-
-
-        YA TENES USUARIO:
-        <a href="login.php">LOGUEATE!</a>
-    </body>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<title>Registro exitoso</title>
+	</head>
+	<body>
+		<h1>Te registraste con éxito :D</h1>
+		<a href="login.php">¿Ya tenés usuario? - Logueate</a>
+	</body>
 </html>

@@ -1,89 +1,97 @@
 <?php
-require_once('funciones.php');
+	require_once('funciones.php');
 
-if (estaLogueado()) {
-    header('location:perfil.php');
-    exit;
-}
+	if (estaLogueado()) {
+		header('location: perfil.php');
+		exit;
+	}
 
+	// Variables para persistencia
+	$email = '';
 
-$email = '';
+	// Array de errores vacío
+	$errores = [];
 
-$errores = [];
+	// Si envían algo por $_POST
+	if ($_POST) {
+		$email = trim($_POST['email']);
 
-if ($_POST) {
-    $email = trim($_POST['email']);
+		$errores = validarLogin($_POST);
 
-    $errores = validarLogin($_POST);
+		if (empty($errores)) {
+			$usuario = existeEmail($email);
 
-    if (empty($errores)) {
+			loguear($usuario);
 
-        $usuario = existeMail($email);
+			// Seteo la cookie
+			if (isset($_POST["recordar"])) {
+	        setcookie('id', $usuario['id'], time() + 3600 * 24 * 30);
+	      }
 
-        loguear($usuario);
-
-        if ($_POST['recordar']) {
-            setcookie('id', $usuario['id'], time() + 3600 );
-        }
-
-        header('location:perfil.php');
-        exit;
-    }
-
-
-}
-
-
-
-
- ?>
-
+			header('location: perfil.php');
+			exit;
+		}
+	}
+?>
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>Logueate Compa!</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/style.css">
+	<head>
+		<meta charset="utf-8">
+		<title>Formulario</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+   <body>
+		<?php if (!empty($errores)): ?>
+			<div class="div-errores alert alert-danger">
+				<ul>
+					<?php foreach ($errores as $value): ?>
+					<li><?=$value?></li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		<?php endif; ?>
 
-</head>
-    <body>
-        <div class="data-form">
-            <form  method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="name">Email:</label>
-                    <input class="form-control" type="text" name="email" value="<?=$email?>">
-                    <?php if (isset($errores['email'])): ?>
-        				<span style="color: red;"><?=$errores['email'];?></span>
-        			<?php endif; ?>
-                </div>
-                <br><br>
-                <div class="form-group">
-                    <label for="name">Contraseña:</label>
-                    <input class="form-control" type="text" name="pass" value="">
-                    <?php if (isset($errores['pass'])): ?>
-        				<span style="color: red;"><?=$errores['pass'];?></span>
-        			<?php endif; ?>
-                </div>
-                <br><br>
-                Mantener Logueado!
-                <input type="checkbox" name="recordar">
-                <br><br>
-                <button class="btn btn-primary mb-2" type="submit">Enviar</button>
-            </form>
+		<div class="data-form">
+			<form  method="post" enctype="multipart/form-data">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="name">Email:</label>
+							<input class="form-control" type="text" name="email" value="<?=$email?>">
+							<?php if (isset($errores['email'])): ?>
+								<span style="color: red;">
+									<b class="glyphicon glyphicon-exclamation-sign"></b>
+									<?=$errores['email'];?>
+								</span>
+							<?php endif; ?>
+		            </div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="name">Contraseña:</label>
+							<input class="form-control" type="text" name="pass" value="">
+							<?php if (isset($errores['pass'])): ?>
+								<span style="color: red;">
+									<b class="glyphicon glyphicon-exclamation-sign"></b>
+									<?=$errores['pass'];?>
+								</span>
+							<?php endif; ?>
+		            </div>
+					</div>
+				</div>
 
-            <?php if (count($errores) > 0 ): ?>
-                <div class="div-errores">
-                    <ul>
-                    <?php foreach ($errores as $value): ?>
-                        <li><?=$value?></li>
-                    <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-            </div>
-        </div>
-    </body>
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<input type="checkbox" name="recordar">
+							Recordar
+						</div>
+					</div>
+				</div>
+
+            <button class="btn btn-primary" type="submit">Enviar</button>
+        </form>
+	  	</div>
+   </body>
 </html>

@@ -1,134 +1,160 @@
 <?php
-require_once('funciones.php');
+	require_once('funciones.php');
 
-if (estaLogueado()) {
-    header('location:perfil.php');
-    exit;
-}
+	if (estaLogueado()) {
+		header('location: perfil.php');
+		exit;
+	}
 
-$paises = ['Argentina', 'Brasil', 'Colombia', 'Sin Mundial'];
+	// Array de países para el foreach en el select
+	$paises = ['Argentina', 'Brasil', 'Colombia', 'Sin Mundial'];
 
-$name = '';
-$email = '';
-$pais = '';
+	// Variables para persistencia
+	$name = '';
+	$email = '';
+	$pais = '';
 
-$errores = [];
+	// Array de errores vacío
+	$errores = [];
 
-if ($_POST) {
-    $name = trim($_POST['name']);
-    $email = trim($_POST['email']);
-    $pais = trim($_POST['pais']);
+	// Si envían algo por $_POST
+	if ($_POST) {
+		// Persisto los datos con la información que envía el usuario por $_POST
+		$name = trim($_POST['name']);
+		$email = trim($_POST['email']);
+		$pais = trim($_POST['pais']);
 
+		// Valido y guardo en errores
+		$errores = validar($_POST, 'avatar');
 
-    $errores = validar($_POST, 'avatar');
+		// Si el array de errorres está vacío, es porque no hubo errores, por lo tanto procedo con lo siguiente
+		if (empty($errores)) {
 
+			$errores = guardarImagen('avatar');
 
-    if (empty($errores)) {
+			if (empty($errores)) {
+				// En la variable $usuario, guardo al usuario creado con la función crearUsuario() la cual recibe los datos de $_POST y el avatar
+				$usuario = guardarUsuario($_POST, 'avatar');
 
-        $errores = guardarImagen('avatar');
-
-        if (count($errores) == 0) {
-            guardarUsuario($_POST, 'avatar');
-
-            header('location:felicidades.php');
-            exit;
-        }
-
-    }
-
-
-
-}
-
- ?>
-
-
-
+				header('location: felicidades.php');
+				exit;
+			}
+		}
+	}
+?>
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Formulario</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-        <link rel="stylesheet" href="css/style.css">
+	<head>
+		<meta charset="utf-8">
+		<title>Formulario</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+   <body>
+		<?php if (!empty($errores)): ?>
+			<div class="div-errores alert alert-danger">
+				<ul>
+					<?php foreach ($errores as $value): ?>
+					<li><?=$value?></li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		<?php endif; ?>
 
-    </head>
-    <body>
-        <div class="data-form">
-        <form  method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="name">Nombre:</label>
-                <input type="text" class="form-control" name="name" value="<?=$name?>">
-                <?php if (isset($errores['name'])): ?>
-    				<span style="color: red;"><?=$errores['name'];?></span>
-    			<?php endif; ?>
-            </div>
-            <br><br>
-            <div class="form-group">
-                <label for="name">Email:</label>
-                <input class="form-control" type="text" name="email" value="<?=$email?>">
-                <?php if (isset($errores['email'])): ?>
-    				<span style="color: red;"><?=$errores['email'];?></span>
-    			<?php endif; ?>
-            </div>
-            <br><br>
-            <div class="form-group">
-                <label for="name">Contraseña:</label>
-                <input class="form-control" type="text" name="pass" value="">
-                <?php if (isset($errores['pass'])): ?>
-    				<span style="color: red;"><?=$errores['pass'];?></span>
-    			<?php endif; ?>
-            </div>
-            <br><br>
-            <div class="form-group">
-                <label for="name">Repetir Contraseña:</label>
-                <input class="form-control" type="text" name="rpass" value="">
-                <?php if (isset($errores['pass'])): ?>
-    				<span style="color: red;"><?=$errores['pass'];?></span>
-    			<?php endif; ?>
-            </div>
-            <br><br>
-            <div class="form-group">
-                Pais:
-                <select class="form-control" class="" name="pais">
-                    <option value="">Elegi País</option>
-                    <?php foreach ($paises as $value): ?>
-                        <?php if ($value == $pais): ?>
-                            <option selected value="<?=$value?>"><?=$value?></option>
-                        <?php else: ?>
-                            <option value="<?=$value?>"><?=$value?></option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </select>
-                <?php if (isset($errores['pais'])): ?>
-    				<span style="color: red;"><?=$errores['pais'];?></span>
-    			<?php endif; ?>
-            </div>
-            <br><br>
-            <div class="form-group">
-                <label for="name">Cargá tu imagen:</label>
-                <input class="form-control" type="file" name="avatar" value="">
-                <?php if (isset($errores['pass'])): ?>
-    				<span style="color: red;"><?=$errores['avatar'];?></span>
-    			<?php endif; ?>
-            </div>
-            <br><br>
-            <button class="btn btn-primary mb-2" type="submit">Enviar</button>
+		<div class="data-form">
+			<form  method="post" enctype="multipart/form-data">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="name">Nombre:</label>
+							<input type="text" class="form-control" name="name" value="<?=$name?>">
+							<?php if (isset($errores['name'])): ?>
+								<span style="color: red;">
+									<b class="glyphicon glyphicon-exclamation-sign"></b>
+									<?=$errores['name'];?>
+								</span>
+							<?php endif; ?>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="name">Email:</label>
+							<input class="form-control" type="text" name="email" value="<?=$email?>">
+							<?php if (isset($errores['email'])): ?>
+								<span style="color: red;">
+									<b class="glyphicon glyphicon-exclamation-sign"></b>
+									<?=$errores['email'];?>
+								</span>
+							<?php endif; ?>
+		            </div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="name">Contraseña:</label>
+							<input class="form-control" type="text" name="pass" value="">
+							<?php if (isset($errores['pass'])): ?>
+								<span style="color: red;">
+									<b class="glyphicon glyphicon-exclamation-sign"></b>
+									<?=$errores['pass'];?>
+								</span>
+							<?php endif; ?>
+		            </div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="name">Repetir Contraseña:</label>
+							<input class="form-control" type="text" name="rpass" value="">
+							<?php if (isset($errores['pass'])): ?>
+		    					<span style="color: red;">
+									<b class="glyphicon glyphicon-exclamation-sign"></b>
+									<?=$errores['pass'];?>
+								</span>
+							<?php endif; ?>
+		            </div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="name">País:</label>
+		               <select class="form-control" class="" name="pais">
+								<option value="">Elegi País</option>
+									<?php foreach ($paises as $value): ?>
+										<?php if ($value == $pais): ?>
+											<option selected value="<?=$value?>"><?=$value?></option>
+										<?php else: ?>
+											<option value="<?=$value?>"><?=$value?></option>
+										<?php endif; ?>
+									<?php endforeach; ?>
+								</select>
+								<?php if (isset($errores['pais'])): ?>
+									<span style="color: red;">
+										<b class="glyphicon glyphicon-exclamation-sign">
+										</b><?=$errores['pais'];?>
+									</span>
+								<?php endif; ?>
+		            </div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label for="name">Subir imagen:</label>
+							<input class="form-control" type="file" name="avatar">
+							<?php if (isset($errores['avatar'])): ?>
+		    					<span style="color: red;">
+									<b class="glyphicon glyphicon-exclamation-sign"></b>
+									<?=$errores['avatar'];?>
+								</span>
+							<?php endif; ?>
+						</div>
+					</div>
+				</div>
+
+            <button class="btn btn-primary" type="submit">Enviar</button>
         </form>
-
-        <?php if (count($errores) > 0 ): ?>
-            <div class="div-errores">
-                <ul>
-                <?php foreach ($errores as $value): ?>
-                    <li><?=$value?></li>
-                <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-        </div>
-    </body>
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	  	</div>
+   </body>
 </html>
