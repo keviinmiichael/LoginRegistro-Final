@@ -36,8 +36,8 @@
 				// En la variable $usuario, guardo al usuario creado con la función crearUsuario() la cual recibe los datos de $_POST y el avatar
 				$usuario = guardarUsuario($_POST, 'avatar');
 
-				header('location: felicidades.php');
-				exit;
+				// Logueo al usuario y por lo tanto no es necesario el re-direct
+				loguear($usuario);
 			}
 		}
 	}

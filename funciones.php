@@ -9,8 +9,9 @@
 
 	// == FUNCTION - crearUsuario ==
 	/*
-		- Recibe un parámetro -> $_POST
+		- Recibe dos parámetros -> $_POST y el nombre del campo de subir imagen
 		- Con estos datos, genera un array nuevo
+		- Usa la función traerUltimoID() para generar un ID para cada usuario
 		- Retorna el array con el usuario final
 	*/
 	function crearUsuario($data, $imagen) {
@@ -26,6 +27,15 @@
 	   return $usuario;
 	}
 
+
+
+	// == FUNCTION - validar ==
+	/*
+		- Recibe dos parámetros -> $_POST y el nombre del campo de subir imagen
+		- Valida en el 1er submit que todos los campos son obligatorios
+		- Usa la función existeEmail() para verificar que no haya registros con el mismo email
+		- Retorna un array de errores que puede estar vacio
+	*/
 	function validar($data, $archivo) {
 		$errores = [];
 
@@ -51,23 +61,31 @@
 		} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 			// Si el email no es un formato valido
 			$errores['email'] = "Por favor poner un email de verdad, gatx.";
-		} elseif (existeEmail($email)) {
+		} elseif (existeEmail($email)) { // Si el email ya está registrado vacio
 			$errores['email'] = "Este email ya existe.";
 		}
 
-		if ($pass == '' || $rpass == '') { // Si la contraeña o repetir contraseña está(n) vacio(s)
+		if ($pass == '' || $rpass == '') { // Si la contraseña o repetir contraseña está(n) vacio(s)
 			$errores['pass'] = "Por favor completa tus passwords";
 		} elseif ($pass != $rpass) {
 			$errores['pass'] = "Tus contraseñas no coinciden";
 		}
 
-		if ($_FILES[$archivo]['error'] != UPLOAD_ERR_OK) {
+		if ($_FILES[$archivo]['error'] != UPLOAD_ERR_OK) { // Si no subieron ninguna imagen
 			$errores['avatar'] = "Che subí una foto";
 		}
 
 		return $errores;
 	}
 
+
+
+	// == FUNCTION - traerTodos ==
+	/*
+		- NO recibe parámetros
+		- Lee el JSON y arma un array de arrays de usuarios, cada línea en el JSON será un array de 1 usuario
+		- Retorna el array con todos los usuarios
+	*/
 	function traerTodos() {
 		// Traigo la data de todos los usuarios de 'usuarios.json'
 		$todosJson = file_get_contents('usuarios.json');
@@ -89,6 +107,14 @@
 		return $todosPHP;
 	}
 
+
+
+	// == FUNCTION - traerUltimoID ==
+	/*
+		- NO recibe parámetros
+		- Usa la función traerTodos()
+		- Retorna un número. En el 1er usuario registrado devuelve 1 y en los siguientes al ID actual le suma 1
+	*/
 	function traerUltimoID(){
 		// me traigo todos los usuarios
 		$usuarios = traerTodos();
@@ -97,13 +123,13 @@
 			return 1;
 		}
 
-		// en caso de que haya usuarios agarro el ultimo usuario
+		// En caso de que haya usuarios agarro el ultimo usuario
 		$elUltimo = array_pop($usuarios);
 
-		// pregunto por le id de ese ultimo usuario
+		// Pregunto por le ID de ese ultimo usuario
 		$id = $elUltimo['id'];
 
-		// a ese ID le sumo 1, para asignarle el nuevo ID al usuario  que se esta registrando
+		// A ese ID le sumo 1, para asignarle el nuevo ID al usuario que se esta registrando
 		return $id + 1;
 	}
 
@@ -128,6 +154,14 @@
 		return false;
 	}
 
+
+
+	// == FUNCTION - guardarImagen ==
+	/*
+		- Recibe un parámetro -> el nombre del campo de la imagen
+		- Se encarga de guardar el archivo de imagen en la ruta definida
+		- Retorna un array de errores si los hay
+	*/
 	function guardarImagen($laImagen){
 		$errores = [];
 
@@ -159,11 +193,15 @@
 		return $errores;
 	}
 
+
+
+
 	// == FUNCTION - guardarUsuario ==
 	/*
-		- Recibe un parámetro
-		- $usuario: array creado con la función crearUsuario()
-		- No retorna nada, se encarga de guardar en el JSON el usuario recibido
+		- Recibe dos parámetros -> $_POST y el nombre del campo de la imagen
+		- Usa la función crearUsuario()
+		- Su función principal es guardar al usuario
+		- Retorna el usuario para poder auto-loguear después del registro
 	*/
 	function guardarUsuario($data, $imagen){
 
@@ -173,8 +211,19 @@
 
 		// Inserta el objeto JSON en nuestro archivo de usuarios
 		file_put_contents('usuarios.json', $usuarioJSON . PHP_EOL, FILE_APPEND);
+
+		// Devuelvo al usuario para poder auto loguearlo después del registro
+		return $usuario;
 	}
 
+
+
+	// == FUNCTION - validarLogin ==
+	/*
+		- Recibe un parámetro -> $_POST
+		- Usa la función existeEmail()
+		- Retorna un array de errores que puede estar vacio
+	*/
 	function validarLogin($data) {
 		$arrayADevolver = [];
 		$email = trim($data['email']);
@@ -187,9 +236,9 @@
 		} elseif (!existeEmail($email)) {
 			$arrayADevolver['pass'] = 'Este email no está registrado';
 		} else {
-			// si el mail existe, me guardo al usuario dueño del mismo
+			// Si el mail existe, me guardo al usuario dueño del mismo
 			$usuario = existeEmail($email);
- 			// pregunto si coindice la password escrita con la guardada en el JSON
+ 			// Pregunto si coindice la password escrita con la guardada en el JSON
       	if (!password_verify($pass, $usuario["pass"])) {
          	$arrayADevolver['pass'] = "Credenciales incorrectas";
       	}
@@ -198,21 +247,38 @@
 		return $arrayADevolver;
 	}
 
+
+
 	// FUNCTION - loguear
+	/*
+		- Recibe un parámetro -> el usuario
+		- Guarda en sesión el ID del usuario que recibe
+		- Redirecciona a perfil.php
+	*/
 	function loguear($usuario) {
 		// Guardo en $_SESSION el ID del USUARIO
 	   $_SESSION['id'] = $usuario['id'];
+		header('location: perfil.php');
+		exit;
 	}
 
 	// FUNCTION - estaLogueado
+	/*
+		- No recibe parámetros
+		- Pregunta si está guardado en SESIÓN el ID del $usuarios
+	*/
 	function estaLogueado() {
 		return isset($_SESSION['id']);
 	}
 
+
+
+
 	// == FUNCTION - traerId ==
 	/*
-		- Recibe un parámetro
-		- $id:
+		- Recibe un parámetro -> $id:
+		- Devuelve el usuario si encuentra a alguno con ese ID
+		- Devuelve false si no hay usuarios con ese ID
 	*/
 	function traerPorId($id){
 		// me traigo todos los usuarios
