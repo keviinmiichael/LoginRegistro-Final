@@ -204,7 +204,6 @@
 	   $_SESSION['id'] = $usuario['id'];
 	}
 
-
 	// FUNCTION - estaLogueado
 	function estaLogueado() {
 		return isset($_SESSION['id']);
