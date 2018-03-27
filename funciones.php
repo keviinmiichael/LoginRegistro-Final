@@ -173,6 +173,9 @@
 
 		// Inserta el objeto JSON en nuestro archivo de usuarios
 		file_put_contents('usuarios.json', $usuarioJSON . PHP_EOL, FILE_APPEND);
+
+		// Devuelvo al usuario para poder auto loguearlo después del registro
+		return $usuario;
 	}
 
 	function validarLogin($data) {
@@ -202,6 +205,8 @@
 	function loguear($usuario) {
 		// Guardo en $_SESSION el ID del USUARIO
 	   $_SESSION['id'] = $usuario['id'];
+		header('location: perfil.php');
+		exit;
 	}
 
 
