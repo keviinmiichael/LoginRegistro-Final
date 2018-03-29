@@ -270,7 +270,6 @@
 		exit;
 	}
 
-
 	// FUNCTION - estaLogueado
 	/*
 		- No recibe parámetros
