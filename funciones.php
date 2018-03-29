@@ -73,6 +73,13 @@
 
 		if ($_FILES[$archivo]['error'] != UPLOAD_ERR_OK) { // Si no subieron ninguna imagen
 			$errores['avatar'] = "Che subí una foto";
+		} else {
+			$ext = strtolower(pathinfo($_FILES[$archivo]['name'], PATHINFO_EXTENSION));
+
+			if ($ext != 'jpg' && $ext != 'png' && $ext != 'jpeg') {
+				$errores['avatar'] = "Formatos admitidos: JPG o PNG";
+			} 
+
 		}
 
 		return $errores;
@@ -233,11 +240,12 @@
 			$arrayADevolver['email'] = 'Completá tu email';
 		} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 			$arrayADevolver['email'] = 'Poné un formato de email válido';
-		} elseif (!existeEmail($email)) {
-			$arrayADevolver['pass'] = 'Este email no está registrado';
+		} elseif (!$usuario = existeEmail($email)) {
+			$arrayADevolver['email'] = 'Este email no está registrado';
 		} else {
 			// Si el mail existe, me guardo al usuario dueño del mismo
-			$usuario = existeEmail($email);
+			// $usuario = existeEmail($email);
+			
  			// Pregunto si coindice la password escrita con la guardada en el JSON
       	if (!password_verify($pass, $usuario["pass"])) {
          	$arrayADevolver['pass'] = "Credenciales incorrectas";

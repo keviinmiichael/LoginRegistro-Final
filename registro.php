@@ -65,62 +65,54 @@
 			<form  method="post" enctype="multipart/form-data">
 				<div class="row">
 					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="name">Nombre:</label>
+						<div class="form-group <?= isset($errores['name']) ? 'has-error' : null ?>">
+							<label class="control-label">Nombre:</label>
 							<input type="text" class="form-control" name="name" value="<?=$name?>">
-							<?php if (isset($errores['name'])): ?>
-								<span style="color: red;">
-									<b class="glyphicon glyphicon-exclamation-sign"></b>
-									<?=$errores['name'];?>
-								</span>
-							<?php endif; ?>
+							<span class="help-block" style="<?= !isset($errores['name']) ? 'display: none;' : ''; ?>">
+								<b class="glyphicon glyphicon-exclamation-sign"></b>
+								<?= isset($errores['name']) ? $errores['name'] : ''; ?>
+							</span>							
 						</div>
 					</div>
 					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="name">Email:</label>
+						<div class="form-group <?= isset($errores['email']) ? 'has-error' : null ?>">
+							<label class="control-label">Email:</label>
 							<input class="form-control" type="text" name="email" value="<?=$email?>">
-							<?php if (isset($errores['email'])): ?>
-								<span style="color: red;">
-									<b class="glyphicon glyphicon-exclamation-sign"></b>
-									<?=$errores['email'];?>
-								</span>
-							<?php endif; ?>
+							<span class="help-block" style="<?= !isset($errores['email']) ? 'display: none;' : ''; ?>">
+								<b class="glyphicon glyphicon-exclamation-sign"></b>
+								<?= isset($errores['email']) ? $errores['email'] : ''; ?>
+							</span>
 		            </div>
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="name">Contraseña:</label>
-							<input class="form-control" type="text" name="pass" value="">
-							<?php if (isset($errores['pass'])): ?>
-								<span style="color: red;">
-									<b class="glyphicon glyphicon-exclamation-sign"></b>
-									<?=$errores['pass'];?>
-								</span>
-							<?php endif; ?>
+						<div class="form-group <?= isset($errores['pass']) ? 'has-error' : null ?>">
+							<label class="control-label">Contraseña:</label>
+							<input class="form-control" type="password" name="pass" value="">
+							<span class="help-block" style="<?= !isset($errores['pass']) ? 'display: none;' : ''; ?>">
+								<b class="glyphicon glyphicon-exclamation-sign"></b>
+								<?= isset($errores['pass']) ? $errores['pass'] : ''; ?>
+							</span>
 		            </div>
 					</div>
 					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="name">Repetir Contraseña:</label>
-							<input class="form-control" type="text" name="rpass" value="">
-							<?php if (isset($errores['pass'])): ?>
-		    					<span style="color: red;">
-									<b class="glyphicon glyphicon-exclamation-sign"></b>
-									<?=$errores['pass'];?>
-								</span>
-							<?php endif; ?>
+						<div class="form-group <?= isset($errores['pass']) ? 'has-error' : null ?>">
+							<label class="control-label">Repetir Contraseña:</label>
+							<input class="form-control" type="password" name="rpass" value="">
+							<span class="help-block" style="<?= !isset($errores['pass']) ? 'display: none;' : ''; ?>">
+								<b class="glyphicon glyphicon-exclamation-sign"></b>
+								<?= isset($errores['pass']) ? $errores['pass'] : ''; ?>
+							</span>
 		            </div>
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="col-sm-6">
-						<div class="form-group">
-							<label for="name">País:</label>
+						<div class="form-group <?= isset($errores['pais']) ? 'has-error' : null ?>">
+							<label class="control-label">País:</label>
 		               <select class="form-control" class="" name="pais">
 								<option value="">Elegi País</option>
 									<?php foreach ($paises as $value): ?>
@@ -131,24 +123,20 @@
 										<?php endif; ?>
 									<?php endforeach; ?>
 								</select>
-								<?php if (isset($errores['pais'])): ?>
-									<span style="color: red;">
-										<b class="glyphicon glyphicon-exclamation-sign">
-										</b><?=$errores['pais'];?>
-									</span>
-								<?php endif; ?>
+								<span class="help-block" style="<?= !isset($errores['pais']) ? 'display: none;' : ''; ?>">
+								<b class="glyphicon glyphicon-exclamation-sign"></b>
+								<?= isset($errores['pais']) ? $errores['pais'] : ''; ?>
+							</span>
 		            </div>
 					</div>
 					<div class="col-xs-6">
-						<div class="form-group">
-							<label for="name">Subir imagen:</label>
-							<input class="form-control" type="file" name="avatar">
-							<?php if (isset($errores['avatar'])): ?>
-		    					<span style="color: red;">
-									<b class="glyphicon glyphicon-exclamation-sign"></b>
-									<?=$errores['avatar'];?>
-								</span>
-							<?php endif; ?>
+						<div class="form-group <?= isset($errores['avatar']) ? 'has-error' : null ?>">
+							<label for="name" class="control-label">Subir imagen:</label>							
+							<input class="form-control" type="file" name="avatar" value="<?= isset($_FILES['avatar']) ? $_FILES['avatar']['name'] : null ?>">							
+							<span class="help-block" style="<?= !isset($errores['avatar']) ? 'display: none;' : '' ; ?>">
+								<b class="glyphicon glyphicon-exclamation-sign"></b>
+								<?= isset($errores['avatar']) ? $errores['avatar'] : '' ;?>
+							</span>
 						</div>
 					</div>
 				</div>
